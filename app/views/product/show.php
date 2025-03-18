@@ -39,10 +39,14 @@ htmlspecialchars($product->category_name, ENT_QUOTES, 'UTF-8') : 'Chưa có danh
 </span>
 </p>
 <div class="mt-4">
-<a href="/webbanhang/Product/addToCart/<?php echo
-$product->id; ?>"
-class="btn btn-success px-4">➕ Thêm vào giỏ hàng</a>
-<a href="/webbanhang/Product/list" class="btn btnsecondary px-4 ml-2">Quay lại danh sách</a>
+    <a href="/webbanhang/Product/addToCart/<?php echo $product->id; ?>" 
+       class="btn btn-success px-4">
+        <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+    </a>
+    <a href="/webbanhang/Product" 
+       class="btn btn-secondary px-4 ms-2">
+        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+    </a>
 </div>
 </div>
 </div>
