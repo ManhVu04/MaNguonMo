@@ -3,35 +3,36 @@
 <div class="container mt-5 mb-5">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white">
-            <h1 class="h4 mb-0">Sửa sản phẩm</h1>
+            <h1 class="h4 mb-0">Thêm sản phẩm mới (API)</h1>
         </div>
         
         <div class="card-body">
-            <form id="edit-product-form">
-                <input type="hidden" id="id" name="id">
-                <input type="hidden" id="existing_image" name="existing_image">
-                
+            <form id="add-product-form">
                 <div class="row g-3">
                     <div class="col-md-12 mb-3">
-                        <label for="name" class="form-label">Tên sản phẩm:</label>
+                        <label for="name" class="form-label">Tên sản phẩm</label>
                         <input type="text" id="name" name="name" class="form-control" required>
+                        <div class="invalid-feedback" id="name-error"></div>
                     </div>
                     
                     <div class="col-md-12 mb-3">
-                        <label for="description" class="form-label">Mô tả:</label>
+                        <label for="description" class="form-label">Mô tả sản phẩm</label>
                         <textarea id="description" name="description" class="form-control" rows="4" required></textarea>
+                        <div class="invalid-feedback" id="description-error"></div>
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="price" class="form-label">Giá:</label>
-                        <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" required>
+                        <label for="price" class="form-label">Giá (VNĐ)</label>
+                        <input type="number" id="price" name="price" class="form-control" min="0" step="1000" required>
+                        <div class="invalid-feedback" id="price-error"></div>
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="category_id" class="form-label">Danh mục:</label>
+                        <label for="category_id" class="form-label">Danh mục</label>
                         <select id="category_id" name="category_id" class="form-select" required>
                             <option value="" disabled selected>Đang tải danh mục...</option>
                         </select>
+                        <div class="invalid-feedback" id="category-error"></div>
                     </div>
                     
                     <div class="col-md-12 mb-3">
@@ -49,11 +50,11 @@
                 </div>
                 
                 <div class="d-flex justify-content-between mt-4">
-                    <a href="/webbanhang/Product/list" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách sản phẩm
+                    <a href="/webbanhang/Product/listAPI" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại
                     </a>
                     <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Lưu thay đổi
+                        <i class="fas fa-save me-2"></i>Thêm sản phẩm
                     </button>
                 </div>
             </form>
@@ -70,37 +71,9 @@
 <?php include 'app/views/shares/footer.php'; ?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const productId = <?= $product->id ?>;
+    const form = document.getElementById('add-product-form');
     const errorMessage = document.getElementById('error-message');
     const errorText = document.getElementById('error-text');
-    
-    // Tải thông tin sản phẩm từ API
-    fetch(`/webbanhang/api/product/${productId}`)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Không thể tải thông tin sản phẩm');
-        }
-        return response.json();
-    })
-    .then(data => {
-        document.getElementById('id').value = data.id;
-        document.getElementById('name').value = data.name;
-        document.getElementById('description').value = data.description;
-        document.getElementById('price').value = data.price;
-        document.getElementById('category_id').value = data.category_id;
-        
-        // Hiển thị hình ảnh nếu có
-        if (data.image) {
-            document.getElementById('existing_image').value = data.image;
-            document.getElementById('preview-img').src = '/webbanhang/' + data.image;
-            document.getElementById('image-preview').style.display = 'block';
-        }
-    })
-    .catch(error => {
-        console.error('Lỗi khi tải thông tin sản phẩm:', error);
-        errorMessage.style.display = 'block';
-        errorText.textContent = 'Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.';
-    });
     
     // Tải danh mục từ API
     fetch('/webbanhang/api/category')
@@ -112,7 +85,12 @@ document.addEventListener("DOMContentLoaded", function() {
     })
     .then(data => {
         const categorySelect = document.getElementById('category_id');
-        categorySelect.innerHTML = '<option value="" disabled>-- Chọn danh mục --</option>';
+        categorySelect.innerHTML = '<option value="" disabled selected>-- Chọn danh mục --</option>';
+        
+        if (data.length === 0) {
+            categorySelect.innerHTML += '<option value="" disabled>Không có danh mục nào</option>';
+            return;
+        }
         
         data.forEach(category => {
             const option = document.createElement('option');
@@ -120,12 +98,6 @@ document.addEventListener("DOMContentLoaded", function() {
             option.textContent = category.name;
             categorySelect.appendChild(option);
         });
-        
-        // Chọn danh mục đã được thiết lập sau khi danh sách đã được tải
-        const savedCategoryId = document.getElementById('category_id').value;
-        if (savedCategoryId) {
-            categorySelect.value = savedCategoryId;
-        }
     })
     .catch(error => {
         console.error('Lỗi khi tải danh mục:', error);
@@ -133,69 +105,66 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     
     // Xử lý submit form
-    document.getElementById('edit-product-form').addEventListener('submit', function(event) {
+    form.addEventListener('submit', function(event) {
         event.preventDefault();
         
         // Reset thông báo lỗi
         errorMessage.style.display = 'none';
+        document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         
         // Kiểm tra dữ liệu cơ bản phía client
         let isValid = true;
         
-        const name = document.getElementById('name').value.trim();
-        const description = document.getElementById('description').value.trim();
-        const price = document.getElementById('price').value;
-        const category_id = document.getElementById('category_id').value;
-        
-        if (!name) {
+        if (!document.getElementById('name').value.trim()) {
             document.getElementById('name').classList.add('is-invalid');
+            document.getElementById('name-error').textContent = 'Vui lòng nhập tên sản phẩm';
             isValid = false;
         }
         
-        if (!description) {
+        if (!document.getElementById('description').value.trim()) {
             document.getElementById('description').classList.add('is-invalid');
+            document.getElementById('description-error').textContent = 'Vui lòng nhập mô tả sản phẩm';
             isValid = false;
         }
         
+        const price = document.getElementById('price').value;
         if (!price || parseFloat(price) <= 0) {
             document.getElementById('price').classList.add('is-invalid');
+            document.getElementById('price-error').textContent = 'Vui lòng nhập giá hợp lệ';
             isValid = false;
         }
         
-        if (!category_id) {
+        if (!document.getElementById('category_id').value) {
             document.getElementById('category_id').classList.add('is-invalid');
+            document.getElementById('category-error').textContent = 'Vui lòng chọn danh mục';
             isValid = false;
         }
         
-        if (!isValid) {
-            errorMessage.style.display = 'block';
-            errorText.textContent = 'Vui lòng điền đầy đủ thông tin sản phẩm';
-            return;
-        }
+        if (!isValid) return;
         
         // Thu thập dữ liệu form
-        const jsonData = {
-            id: document.getElementById('id').value,
-            name: name,
-            description: description,
-            price: price,
-            category_id: category_id
-        };
+        const formData = new FormData(this);
+        const jsonData = {};
         
-        // Xử lý trường hợp có file ảnh mới
+        // Chuyển FormData thành JSON
+        formData.forEach((value, key) => {
+            // Bỏ qua file image trong JSON
+            if (key !== 'image') {
+                jsonData[key] = value;
+            }
+        });
+        
+        // Xử lý trường hợp có file ảnh
         const imageFile = document.getElementById('image').files[0];
         if (imageFile) {
             // Trong API thực tế, bạn sẽ cần upload file trước và nhận đường dẫn trả về
             // Đây chỉ là giả lập, ta giả định ảnh được lưu ở đường dẫn này
             jsonData.image = 'uploads/products/' + imageFile.name;
-        } else if (document.getElementById('existing_image').value) {
-            // Sử dụng ảnh cũ nếu không có ảnh mới
-            jsonData.image = document.getElementById('existing_image').value;
         }
         
         // Gửi dữ liệu đến API
-        fetch(`/webbanhang/api/product/${jsonData.id}`, {
-            method: 'PUT',
+        fetch('/webbanhang/api/product', {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -203,7 +172,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.message === 'Product updated successfully') {
+            if (data.message === 'Product created successfully') {
                 // Tạo và hiển thị thông báo thành công
                 const toast = document.createElement('div');
                 toast.className = 'position-fixed bottom-0 end-0 p-3';
@@ -216,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
                         <div class="toast-body">
-                            Sản phẩm đã được cập nhật thành công.
+                            Sản phẩm đã được thêm thành công.
                         </div>
                     </div>
                 `;
@@ -224,39 +193,52 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // Chuyển hướng sau 1 giây
                 setTimeout(() => {
-                    location.href = '/webbanhang/Product';
+                    location.href = '/webbanhang/Product/listAPI';
                 }, 1000);
-            } else {
-                // Hiển thị lỗi
+            } else if (data.errors) {
+                // Hiển thị lỗi validation từ server
+                Object.keys(data.errors).forEach(field => {
+                    const element = document.getElementById(field);
+                    if (element) {
+                        element.classList.add('is-invalid');
+                        const errorElement = document.getElementById(`${field}-error`);
+                        if (errorElement) {
+                            errorElement.textContent = data.errors[field];
+                        }
+                    }
+                });
+                
                 errorMessage.style.display = 'block';
-                errorText.textContent = data.message || 'Cập nhật sản phẩm thất bại';
+                errorText.textContent = 'Vui lòng kiểm tra lại thông tin sản phẩm';
+            } else {
+                // Hiển thị lỗi chung
+                errorMessage.style.display = 'block';
+                errorText.textContent = data.message || 'Đã xảy ra lỗi khi thêm sản phẩm';
             }
         })
         .catch(error => {
-            console.error('Lỗi khi cập nhật sản phẩm:', error);
+            console.error('Lỗi khi gửi dữ liệu:', error);
             errorMessage.style.display = 'block';
             errorText.textContent = 'Lỗi kết nối đến máy chủ. Vui lòng thử lại sau.';
         });
     });
-});
 
-// Xem trước hình ảnh được chọn
-function previewImage(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('preview-img').src = e.target.result;
-            document.getElementById('image-preview').style.display = 'block';
+    // Thêm hàm previewImage và removeImage
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-img').src = e.target.result;
+                document.getElementById('image-preview').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(file);
     }
-}
 
-// Xóa hình ảnh đã chọn
-function removeImage() {
-    document.getElementById('image').value = '';
-    document.getElementById('existing_image').value = '';
-    document.getElementById('image-preview').style.display = 'none';
-}
-</script>
+    function removeImage() {
+        document.getElementById('image').value = '';
+        document.getElementById('image-preview').style.display = 'none';
+    }
+});
+</script> 

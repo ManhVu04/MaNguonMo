@@ -30,7 +30,7 @@ $stmt->execute();
 $result = $stmt->fetch(PDO::FETCH_OBJ);
 return $result;
 }
-public function addProduct($name, $description, $price, $category_id, $image)
+public function addProduct($name, $description, $price, $category_id, $image = null)
 {
 $errors = [];
 if (empty($name)) {
@@ -52,7 +52,7 @@ $name = htmlspecialchars(strip_tags($name));
 $description = htmlspecialchars(strip_tags($description));
 $price = htmlspecialchars(strip_tags($price));
 $category_id = htmlspecialchars(strip_tags($category_id));
-$image = htmlspecialchars(strip_tags($image));
+$image = $image ? htmlspecialchars(strip_tags($image)) : null;
 $stmt->bindParam(':name', $name);
 $stmt->bindParam(':description', $description);
 $stmt->bindParam(':price', $price);
@@ -69,7 +69,7 @@ $name,
 $description,
 $price,
 $category_id,
-$image
+$image = null
 ) {
 $query = "UPDATE " . $this->table_name . " SET name=:name,
 description=:description, price=:price, category_id=:category_id, image=:image WHERE
@@ -79,7 +79,7 @@ $name = htmlspecialchars(strip_tags($name));
 $description = htmlspecialchars(strip_tags($description));
 $price = htmlspecialchars(strip_tags($price));
 $category_id = htmlspecialchars(strip_tags($category_id));
-$image = htmlspecialchars(strip_tags($image));
+$image = $image ? htmlspecialchars(strip_tags($image)) : null;
 $stmt->bindParam(':id', $id);
 $stmt->bindParam(':name', $name);
 $stmt->bindParam(':description', $description);

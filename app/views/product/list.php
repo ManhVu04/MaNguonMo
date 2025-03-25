@@ -18,16 +18,16 @@ include 'app/views/shares/header.php';
             <!-- Form tìm kiếm nâng cao -->
             <div class="row mb-4">
                 <div class="col-md-8 mx-auto">
-                    <form method="GET" action="/webbanhang/Product/list" class="search-form">
+                    <form method="GET" action="/webbanhang/Product/search" class="search-form">
                         <div class="input-group shadow-lg rounded-pill">
                             <span class="input-group-text bg-white border-0 rounded-pill-start ps-4">
                                 <i class="fas fa-search text-muted"></i>
                             </span>
                             <input type="text" 
-                                   name="search" 
+                                   name="keyword" 
                                    class="form-control border-0 rounded-pill-end bg-white py-3"
                                    placeholder="Tìm kiếm sản phẩm theo tên, mô tả..."
-                                   value="<?php echo htmlspecialchars($_GET['search'] ?? ''); ?>">
+                                   value="<?php echo htmlspecialchars($_GET['keyword'] ?? ''); ?>">
                             <button type="submit" 
                                     class="btn btn-primary rounded-pill ms-2 px-4 fw-bold"
                                     aria-label="Tìm kiếm">
@@ -182,6 +182,7 @@ include 'app/views/shares/header.php';
 .description-preview {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     font-size: 0.9rem;

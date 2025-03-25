@@ -32,7 +32,7 @@ class SessionHelper {
         // Define permissions for each role
         $permissions = [
             'admin' => [
-                'view_products', 'add_product', 'edit_product', 'delete_product',
+                'add_product', 'edit_product', 'delete_product', 
                 'view_categories', 'add_category', 'edit_category', 'delete_category',
                 'view_orders', 'manage_orders',
                 'view_cart', 'checkout'

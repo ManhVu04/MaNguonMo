@@ -27,10 +27,27 @@
             --transition: all 0.3s ease;
         }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
         body {
             font-family: 'Quicksand', sans-serif;
             background-color: var(--gray-100);
             color: var(--gray-800);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+            margin-top: auto !important;
         }
 
         /* Header styling */
@@ -134,6 +151,11 @@
             flex-grow: 0.3;
             max-width: 350px;
         }
+        
+        .search-box form {
+            width: 100%;
+            position: relative;
+        }
 
         .search-input {
             border-radius: 20px;
@@ -167,6 +189,7 @@
             color: rgba(255, 255, 255, 0.8);
             font-size: 1rem;
             transition: var(--transition);
+            pointer-events: none;
         }
         
         .search-input:focus + .search-icon {
@@ -430,7 +453,7 @@
                     <?php if (SessionHelper::hasPermission('view_cart')): ?>
                     <li class="nav-item">
                         <a class="nav-link notification-badge" href="/webbanhang/Product/cart">
-                            <i class="fas fa-shopping-cart nav-icon"></i>Giỏ hàng
+                            <i class="fas fa-shopping-cart me-1"></i> Giỏ hàng
                         </a>
                     </li>
                     <?php endif; ?>
@@ -438,8 +461,10 @@
 
                 <!-- Search Box -->
                 <div class="search-box">
-                    <input type="search" class="form-control search-input" placeholder="Tìm kiếm sản phẩm...">
-                    <i class="fas fa-search search-icon"></i>
+                    <form action="/webbanhang/Product/search" method="GET">
+                        <input type="search" name="keyword" class="form-control search-input" placeholder="Tìm kiếm sản phẩm...">
+                        <i class="fas fa-search search-icon"></i>
+                    </form>
                 </div>
 
                 <!-- User Authentication -->
@@ -517,8 +542,10 @@
     </nav>
 
     <!-- Main Content Container -->
-    <div class="container py-4">
-        <!-- Content will be inserted here -->
+    <div class="content-wrapper">
+        <div class="container py-4">
+            <!-- Content will be inserted here -->
+        </div>
     </div>
 
     <!-- Bootstrap Bundle JS -->

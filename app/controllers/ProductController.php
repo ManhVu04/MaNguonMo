@@ -14,6 +14,11 @@ class ProductController {
     }
 
     public function index() {
+        // Nếu có tham số search thì thực hiện tìm kiếm
+        if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+            return $this->search();
+        }
+        
         // Everyone can view products
         $products = $this->productModel->getProducts();
         include 'app/views/product/list.php';
@@ -274,6 +279,78 @@ class ProductController {
         }
 
         echo json_encode(['success' => true]);
+    }
+
+    public function listAPI()
+    {
+        // Hiển thị view list_api - danh sách sản phẩm sử dụng API
+        require_once 'app/views/product/list_api.php';
+    }
+
+    public function showAPI($id)
+    {
+        // Hiển thị view chi tiết sản phẩm sử dụng API
+        require_once 'app/views/product/show_api.php';
+    }
+
+    public function addAPI()
+    {
+        // Hiển thị view thêm sản phẩm sử dụng API
+        require_once 'app/views/product/add_api.php';
+    }
+
+    public function editAPI($id)
+    {
+        // Hiển thị view chỉnh sửa sản phẩm sử dụng API
+        require_once 'app/views/product/edit_api.php';
+    }
+
+    public function search()
+    {
+        $keyword = $_GET['keyword'] ?? '';
+        $searchQuery = "%$keyword%";
+        
+        try {
+            $query = "SELECT p.id, p.name, p.description, p.price, p.image, c.name as category_name
+                      FROM product p 
+                      LEFT JOIN category c ON p.category_id = c.id
+                      WHERE p.name LIKE :keyword OR p.description LIKE :keyword";
+            
+            $stmt = $this->db->prepare($query);
+            $stmt->bindParam(':keyword', $searchQuery);
+            $stmt->execute();
+            
+            $products = $stmt->fetchAll(PDO::FETCH_OBJ);
+            
+            // Sử dụng view list.php để hiển thị kết quả
+            include 'app/views/product/list.php';
+            
+        } catch (PDOException $e) {
+            echo "Lỗi tìm kiếm: " . $e->getMessage();
+        }
+    }
+
+    public function list()
+    {
+        // Nếu có tham số search thì thực hiện tìm kiếm
+        if (isset($_GET['keyword']) && !empty($_GET['keyword'])) {
+            return $this->search();
+        }
+        
+        // Lấy danh sách sản phẩm từ model
+        try {
+            $query = "SELECT p.id, p.name, p.description, p.price, p.image, c.name as category_name
+                      FROM product p 
+                      LEFT JOIN category c ON p.category_id = c.id";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            $products = $stmt->fetchAll(PDO::FETCH_OBJ);
+            
+            // Bao gồm file view để hiển thị sản phẩm
+            include 'app/views/product/list.php';
+        } catch (PDOException $e) {
+            echo "Lỗi khi lấy danh sách sản phẩm: " . $e->getMessage();
+        }
     }
 }
 ?>

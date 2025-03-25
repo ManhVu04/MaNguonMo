@@ -14,6 +14,14 @@ class CategoryModel {
         return $stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    public function getCategoryById($id) {
+        $query = "SELECT id, name, description FROM " . $this->table_name . " WHERE id = :id";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
     public function addCategory($name, $description) {
         $query = "INSERT INTO " . $this->table_name . " (name, description) VALUES (:name, :description)";
         $stmt = $this->conn->prepare($query);
