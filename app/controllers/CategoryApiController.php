@@ -41,6 +41,14 @@ class CategoryApiController
     {
         header('Content-Type: application/json');
         $data = json_decode(file_get_contents("php://input"), true);
+        
+        // Kiểm tra lỗi JSON
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['message' => 'Invalid JSON: ' . json_last_error_msg()]);
+            return;
+        }
+        
         $name = $data['name'] ?? '';
         $description = $data['description'] ?? '';
         
@@ -59,17 +67,32 @@ class CategoryApiController
     public function update($id)
     {
         header('Content-Type: application/json');
+        
+        // Lấy dữ liệu từ request
         $data = json_decode(file_get_contents("php://input"), true);
+        
+        // Nếu không parse được JSON, trả về lỗi
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            http_response_code(400);
+            echo json_encode(['message' => 'Invalid JSON data: ' . json_last_error_msg()]);
+            return;
+        }
+        
         $name = $data['name'] ?? '';
         $description = $data['description'] ?? '';
         
-        $result = $this->categoryModel->updateCategory($id, $name, $description);
-        
-        if($result) {
-            echo json_encode(['message' => 'Category updated successfully']);
-        } else {
-            http_response_code(400);
-            echo json_encode(['message' => 'Category update failed']);
+        try {
+            $result = $this->categoryModel->updateCategory($id, $name, $description);
+            
+            if($result) {
+                echo json_encode(['message' => 'Category updated successfully']);
+            } else {
+                http_response_code(400);
+                echo json_encode(['message' => 'Category update failed']);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'Server error: ' . $e->getMessage()]);
         }
     }
     
@@ -77,13 +100,19 @@ class CategoryApiController
     public function destroy($id)
     {
         header('Content-Type: application/json');
-        $result = $this->categoryModel->deleteCategory($id);
         
-        if($result) {
-            echo json_encode(['message' => 'Category deleted successfully']);
-        } else {
-            http_response_code(400);
-            echo json_encode(['message' => 'Category deletion failed']);
+        try {
+            $result = $this->categoryModel->deleteCategory($id);
+            
+            if($result) {
+                echo json_encode(['message' => 'Category deleted successfully']);
+            } else {
+                http_response_code(400);
+                echo json_encode(['message' => 'Category deletion failed']);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            echo json_encode(['message' => 'Server error: ' . $e->getMessage()]);
         }
     }
 } 

@@ -2,7 +2,7 @@
 
 <style>
     .login-container {
-        min-height: 85vh;
+        min-height: 70vh;
         background: linear-gradient(135deg, rgba(78, 115, 223, 0.9) 0%, rgba(34, 74, 190, 0.8) 100%);
     }
     
@@ -113,7 +113,7 @@
     }
 </style>
 
-<section class="login-container d-flex justify-content-center align-items-center py-5">
+<section class="login-container d-flex justify-content-center align-items-center py-4 mt-0">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-12 col-md-10 col-lg-8">

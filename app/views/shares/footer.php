@@ -39,6 +39,8 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            margin-top: auto;
         }
 
         .hover-link {

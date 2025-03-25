@@ -3,7 +3,7 @@ require_once 'app/helpers/SessionHelper.php';
 include 'app/views/shares/header.php'; 
 ?>
 
-<div class="container mt-5 mb-5">
+<div class="container mt-0 mb-5">
     <div class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h1 class="h4 mb-0">Danh sách sản phẩm</h1>
@@ -14,9 +14,9 @@ include 'app/views/shares/header.php';
             <?php endif; ?>
         </div>
         
-        <div class="card-body">
+        <div class="card-body py-3">
             <!-- Form tìm kiếm nâng cao -->
-            <div class="row mb-4">
+            <div class="row mb-3">
                 <div class="col-md-8 mx-auto">
                     <form method="GET" action="/webbanhang/Product/search" class="search-form">
                         <div class="input-group shadow-lg rounded-pill">

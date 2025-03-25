@@ -305,6 +305,12 @@ class ProductController {
         require_once 'app/views/product/edit_api.php';
     }
 
+    public function apiFrontend()
+    {
+        // Hiển thị trang frontend sử dụng jQuery để tương tác với API
+        require_once 'app/views/product/api_frontend.php';
+    }
+
     public function search()
     {
         $keyword = $_GET['keyword'] ?? '';

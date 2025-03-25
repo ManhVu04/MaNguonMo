@@ -43,6 +43,10 @@
 
         .content-wrapper {
             flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 0;
         }
 
         footer {
@@ -543,7 +547,7 @@
 
     <!-- Main Content Container -->
     <div class="content-wrapper">
-        <div class="container py-4">
+        <div class="container py-1">
             <!-- Content will be inserted here -->
         </div>
     </div>
