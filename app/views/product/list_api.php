@@ -3,7 +3,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h1 class="h4 mb-0">Danh sách sản phẩm (API)</h1>
-            <a href="/webbanhang/Product/add" class="btn btn-success btn-sm rounded-pill">
+            <a href="/webbanhang/Product/addAPI" class="btn btn-success btn-sm rounded-pill">
                 <i class="fas fa-plus me-2"></i>Thêm mới
             </a>
         </div>
@@ -83,6 +83,7 @@
 .description-preview {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     font-size: 0.9rem;
